@@ -15,4 +15,4 @@ obj = Creat_obj()
 print('Program End...')
 print(obj.designation)
 del obj
-print(obj.designation)
+print(obj.designation) 
