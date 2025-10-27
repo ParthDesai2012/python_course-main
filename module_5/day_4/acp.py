@@ -1,11 +1,11 @@
-input_1 = int(input(print("Enter the 1st word:- ")))
-input_2 = input(print("Enter the 2nd word:- "))
-input_3 = input(print("Enter the 3rd word:- "))
-input_4 = input(print("Enter the 4th word:- "))
-input_5 = input(print("Enter the 5th word:- "))
-input_1.reverse()
-input_2.reverse()
-input_3.reverse()
-input_4.reverse()
-input_5.reverse()
-print(f"{input_1}, {input_2}, {input_3}, {input_4}, {input_5}")
+input1 = input("Enter the 1st word: ")
+input2 = input("Enter the 2nd word: ")
+input3 = input("Enter the 3rd word: ")
+input4 = input("Enter the 4th word: ")
+input5 = input("Enter the 5th word: ")
+input1 = input1[::-1]
+input2 = input2[::-1]
+input3 = input3[::-1]
+input4 = input4[::-1]
+input5 = input5[::-1]
+print(f"{input1} {input2} {input3} {input4} {input5}")
