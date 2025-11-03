@@ -1,6 +1,6 @@
 import pygame
 import random
-from zombie import Zombie
+import math
 
 # Initialize Pygame
 pygame.init()
@@ -17,7 +17,9 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
+# ---------------------------
 # Player class
+# ---------------------------
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -36,7 +38,9 @@ class Player(pygame.sprite.Sprite):
         # Keep inside screen
         self.rect.clamp_ip(screen.get_rect())
 
+# ---------------------------
 # Bullet class
+# ---------------------------
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, target_pos):
         super().__init__()
@@ -44,46 +48,73 @@ class Bullet(pygame.sprite.Sprite):
         self.image.fill(RED)
         self.rect = self.image.get_rect(center=(x, y))
         dx, dy = target_pos[0]-x, target_pos[1]-y
-        distance = max((dx**2 + dy**2)**0.5, 1)
+        distance = max(math.hypot(dx, dy), 1)
         self.velocity = (dx/distance*10, dy/distance*10)
 
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-        # Remove if out of screen
         if not screen.get_rect().collidepoint(self.rect.center):
             self.kill()
 
+# ---------------------------
+# Zombie class
+# ---------------------------
+class Zombie(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.Surface((30, 30))
+        self.image.fill((100, 0, 0))  # Dark red zombie
+        self.rect = self.image.get_rect(center=(x, y))
+        self.speed = random.uniform(0.5, 1.5)
+        self.health = 50
+
+    def move_towards_player(self, player):
+        dx = player.rect.centerx - self.rect.centerx
+        dy = player.rect.centery - self.rect.centery
+        distance = math.hypot(dx, dy)
+        if distance != 0:
+            dx, dy = dx / distance, dy / distance
+            self.rect.x += dx * self.speed
+            self.rect.y += dy * self.speed
+
+    def take_damage(self, amount):
+        self.health -= amount
+        if self.health <= 0:
+            self.kill()
+
+    def update(self, player):
+        self.move_towards_player(player)
+
+# ---------------------------
 # Sprite groups
+# ---------------------------
 player = Player()
-player_group = pygame.sprite.Group()
-player_group.add(player)
-
-zombie_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group(player)
 bullet_group = pygame.sprite.Group()
+zombie_group = pygame.sprite.Group()
 
-# Spawn some zombies
+# Spawn initial zombies
 for _ in range(5):
     x = random.choice([random.randint(-100, -40), random.randint(WIDTH+40, WIDTH+100)])
     y = random.choice([random.randint(-100, -40), random.randint(HEIGHT+40, HEIGHT+100)])
-    zombie = Zombie(x, y)
-    zombie_group.add(zombie)
+    zombie_group.add(Zombie(x, y))
 
 # Score
 score = 0
 
+# ---------------------------
 # Game loop
+# ---------------------------
 running = True
 while running:
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        # Shoot bullet
+        # Shoot bullet on left mouse click
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            mouse_pos = pygame.mouse.get_pos()
-            bullet = Bullet(player.rect.centerx, player.rect.centery, mouse_pos)
-            bullet_group.add(bullet)
+            bullet_group.add(Bullet(player.rect.centerx, player.rect.centery, pygame.mouse.get_pos()))
 
     # Update
     player_group.update()
@@ -92,8 +123,8 @@ while running:
 
     # Bullet-Zombie collision
     for bullet in bullet_group:
-        hit_zombies = pygame.sprite.spritecollide(bullet, zombie_group, False)
-        for zombie in hit_zombies:
+        hits = pygame.sprite.spritecollide(bullet, zombie_group, False)
+        for zombie in hits:
             zombie.take_damage(25)
             bullet.kill()
             if not zombie.alive():
@@ -107,8 +138,8 @@ while running:
             running = False
             print("Game Over! Final Score:", score)
 
-    # Draw
-    screen.fill((30,30,30))
+    # Draw everything
+    screen.fill((30, 30, 30))  # Dark background
     player_group.draw(screen)
     bullet_group.draw(screen)
     zombie_group.draw(screen)
@@ -117,8 +148,7 @@ while running:
     pygame.draw.rect(screen, RED, (10, 10, 100, 10))
     pygame.draw.rect(screen, GREEN, (10, 10, player.health, 10))
     font = pygame.font.SysFont(None, 24)
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (10, 30))
+    screen.blit(font.render(f"Score: {score}", True, WHITE), (10, 30))
 
     pygame.display.flip()
 
