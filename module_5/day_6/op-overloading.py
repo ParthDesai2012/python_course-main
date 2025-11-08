@@ -16,12 +16,12 @@ class A:
         
 ob1 = A(20)
 ob2 = A(3)
-print(f"Passed Values : {ob1.a}. {ob2.a}")
+print(f"Passed Values : {ob1.a}, {ob2.a}")
 print(ob1 < ob2)
 
 ob3 = A(3)
 ob4 = A(4)
-print(f"Passed Values : {ob3.a}. {ob4.a}")
+print(f"Passed Values : {ob3.a}, {ob4.a}")
 print(ob3 == ob4)
 
 
