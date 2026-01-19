@@ -19,7 +19,7 @@ entry = tk.Entry(root)
 entry.pack(pady=5)
 
 btn = tk.Button(root, text="Convert", command=convert)
-btn.pack(pady=50)
+btn.pack(pady=5)
 
 result_label = tk.Label(root, text="", font=("Arial", 12))
 result_label.pack(pady=10)

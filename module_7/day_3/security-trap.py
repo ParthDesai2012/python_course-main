@@ -19,7 +19,7 @@ def access(event):
 
 # Bind events
 root.bind("<Button-1>", intruder)   # Left mouse click
-root.bind("<Button-2>", access)       # Enter key
+root.bind("<Return>", access)       # Enter key
 
 # Run the application
 root.mainloop()
